@@ -32,7 +32,6 @@ class WoopraFrontend extends Woopra {
 		//If event tracking is turned on, process events
 		if ($this->get_option('process_event')) {
 			$this->register_events();
-			$this->register_woocommerce_events();
 		}
 		
 		if ($this->get_option('other_events')) {
@@ -71,34 +70,6 @@ class WoopraFrontend extends Woopra {
 	 		}
 		}
 	 }
-
-	 /**
-	 * Registers woocommerce events
-	 * @return none
-	 */
-	 function register_woocommerce_events() {
-	 	$all_events = $this->events->default_woocommerce_events;
-	 	$event_status = $this->get_option('woopra_woocommerce_event');
-	 	foreach ($all_events as $event_name => $data) {
-	 		if (($event_status[$data['action']] == 1)) {
-		 		switch($data['action']) {
-		 			case "cart":
-		 				add_action('woocommerce_cart_loaded_from_session', array(&$this, 'initialize_cart_quantities'));
-		 				add_action('woocommerce_after_cart_item_quantity_update', array(&$this, 'track_cart_quantity'));
-		 				add_action('woocommerce_before_cart_item_quantity_zero', array(&$this, 'track_cart_quantity_zero'));
-		 				add_action('woocommerce_add_to_cart', array(&$this, 'track_cart_add'), 2, 6);
-		 				add_action('woocommerce_cart_item_removed', array(&$this, 'track_cart_remove'));
-		 			break;
-		 			case "checkout":
-		 				add_action('woocommerce_checkout_order_processed', array(&$this, 'track_checkout'), 10, 2);
-		 			break;
-		 			case "coupon":
-		 				add_action('woocommerce_applied_coupon', array(&$this, 'track_coupon'));
-		 			break;
-		 		}
-	 		}
-		}
-	}
 
 	 /**
 	 * Tracks a signup
